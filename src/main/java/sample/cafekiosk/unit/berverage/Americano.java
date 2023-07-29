@@ -8,6 +8,6 @@ public class Americano implements Berverage {
 
     @Override
     public String getName() {
-        return "Americano";
+        return "아메리카노";
     }
 }

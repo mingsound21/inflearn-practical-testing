@@ -1,13 +1,17 @@
 package sample.cafekiosk;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sample.cafekiosk.unit.CafeKiosk;
 import sample.cafekiosk.unit.berverage.Americano;
+import sample.cafekiosk.unit.berverage.Latte;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class CafekioskTests {
 
     @Test
-    void add() {
+    void add_manual_test() {
         CafeKiosk cafeKiosk = new CafeKiosk();
         cafeKiosk.add(new Americano());
 
@@ -18,4 +22,43 @@ class CafekioskTests {
     // 이유 : 상황을 만들어 콘솔에 결과를 찍어내 결국엔 콘솔을 보고 검증을 한 것은 기계가 아닌 사람 = 자동화된 테스트가 아님
     // 문제점 1. 최종 단계에 사람의 개입이 필요
     // 문제점 2. 테스트코드를 작성한 내가 아닌 다른사람이 보기에는 어떤 것을 검증해야하고, 어떤 상황이 맞는 상황이고 틀린 상황인지 파악 불가능
+
+    @Test
+    void add() {
+        CafeKiosk cafeKiosk = new CafeKiosk();
+        cafeKiosk.add(new Americano());
+
+        assertThat(cafeKiosk.getBerverages().size()).isEqualTo(1);
+        assertThat(cafeKiosk.getBerverages()).hasSize(1); // 위와 같은 리스트 크기 검증
+        assertThat(cafeKiosk.getBerverages().get(0).getName()).isEqualTo("아메리카노");
+    }
+
+    @Test
+    void remove() {
+        CafeKiosk cafeKiosk = new CafeKiosk();
+        Americano 아메리카노 = new Americano();
+
+        cafeKiosk.add(아메리카노);
+        assertThat(cafeKiosk.getBerverages()).hasSize(1);
+
+        cafeKiosk.remove(아메리카노);
+        assertThat(cafeKiosk.getBerverages().size()).isEqualTo(0);
+        assertThat(cafeKiosk.getBerverages()).hasSize(0);
+        assertThat(cafeKiosk.getBerverages()).isEmpty(); // 빈 리스트인지 검증
+    }
+
+    @Test
+    void clear() {
+        CafeKiosk cafeKiosk = new CafeKiosk();
+        Americano 아메리카노 = new Americano();
+        Latte 라떼 = new Latte();
+
+        cafeKiosk.add(아메리카노);
+        cafeKiosk.add(라떼);
+        assertThat(cafeKiosk.getBerverages()).hasSize(2);
+
+        cafeKiosk.clear();
+        assertThat(cafeKiosk.getBerverages()).isEmpty(); // 빈 리스트인지 검증
+    }
+
 }
