@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import sample.cafekiosk.unit.CafeKiosk;
 import sample.cafekiosk.unit.berverage.Americano;
 import sample.cafekiosk.unit.berverage.Latte;
+import sample.cafekiosk.unit.order.Order;
+
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -89,6 +92,48 @@ class CafekioskTests {
 
         cafeKiosk.clear();
         assertThat(cafeKiosk.getBerverages()).isEmpty(); // 빈 리스트인지 검증
+    }
+
+    @Test
+    @DisplayName("가게 운영시간 외에는 주문을 생성할 수 없다. - 테스트 실행시각에 의존할 수 밖에 없는 코드")
+    void createOrder() {
+        CafeKiosk cafeKiosk = new CafeKiosk();
+        Americano 아메리카노 = new Americano();
+
+        cafeKiosk.add(아메리카노);
+
+        Order order = cafeKiosk.createOrder();
+
+        assertThat(order.getBerverages()).hasSize(1);
+        assertThat(order.getBerverages().get(0).getName()).isEqualTo("아메리카노");
+    }
+
+    @Test
+    @DisplayName("가게 운영시간 외에는 주문을 생성할 수 없다. - 테스트 실행시각에 의존하지 않고, 직접 인자로 주문시각 입력, 성공")
+    void createOrderWithCurrentTime() {
+        CafeKiosk cafeKiosk = new CafeKiosk();
+        Americano 아메리카노 = new Americano();
+
+        cafeKiosk.add(아메리카노);
+
+        Order order = cafeKiosk.createOrder(LocalDateTime.of(2023, 1, 17, 10, 0)); // 경계값 테스트, 오픈시각인 오전 10시
+
+        assertThat(order.getBerverages()).hasSize(1);
+        assertThat(order.getBerverages().get(0).getName()).isEqualTo("아메리카노");
+    }
+
+    @Test
+    @DisplayName("가게 운영시간 외에는 주문을 생성할 수 없다. - 테스트 실행시각에 의존하지 않고, 직접 인자로 주문시각 입력, 실패")
+    void createOrderOutSideOpenTime() {
+        CafeKiosk cafeKiosk = new CafeKiosk();
+        Americano 아메리카노 = new Americano();
+
+        cafeKiosk.add(아메리카노);
+
+        Assertions.assertThatThrownBy(() -> cafeKiosk.createOrder(LocalDateTime.of(2023, 1, 17, 9, 59)))// 경계값 테스트, 오픈시각 이전 경계값인 오전 9시 59분
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("주문시간이 아닙니다. 관리자에게 문의하세요.");
+
     }
 
 }
